@@ -19,9 +19,9 @@ export const GAME_SETTINGS = {
 // Pipe speed is picked once at the start screen and stays fixed for the
 // run. 'medium' is the original tuned speed.
 export const SPEED_PRESETS = {
-  slow: { label: 'Slow', pipeSpeed: -120 },
-  medium: { label: 'Medium', pipeSpeed: -160 },
-  fast: { label: 'Fast', pipeSpeed: -210 },
+  slow: { label: 'Langsam', pipeSpeed: -120 },
+  medium: { label: 'Mittel', pipeSpeed: -160 },
+  fast: { label: 'Schnell', pipeSpeed: -210 },
 };
 
 export const DEFAULT_SPEED = 'medium';

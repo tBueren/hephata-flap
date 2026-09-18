@@ -85,7 +85,7 @@ export default class PlayScene extends Phaser.Scene {
       .setDepth(UI_DEPTH);
 
     this.instructionText = this.add
-      .text(this.width / 2, this.height / 2 + 80, 'Tap / Click / Space\nto flap', {
+      .text(this.width / 2, this.height / 2 + 80, 'Tippen / Klicken / Leertaste\nzum Flattern', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',

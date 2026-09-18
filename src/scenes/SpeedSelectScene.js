@@ -51,7 +51,7 @@ export default class SpeedSelectScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(x, y + btnHeight / 2 + 14, `press ${index + 1}`, {
+      .text(x, y + btnHeight / 2 + 14, `Taste ${index + 1}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '12px',
         color: '#ffffff',

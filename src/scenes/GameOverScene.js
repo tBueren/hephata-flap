@@ -19,7 +19,7 @@ export default class GameOverScene extends Phaser.Scene {
     this.add.image(width / 2, height / 2, 'background');
 
     this.add
-      .text(width / 2, height / 2 - 120, 'Game Over', {
+      .text(width / 2, height / 2 - 120, 'Spiel vorbei', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '40px',
         color: '#ffffff',
@@ -29,7 +29,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height / 2 - 40, `Score: ${this.score}`, {
+      .text(width / 2, height / 2 - 40, `Punkte: ${this.score}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '28px',
         color: '#ffffff',
@@ -39,7 +39,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, height / 2, `Best: ${best}`, {
+      .text(width / 2, height / 2, `Rekord: ${best}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '28px',
         color: '#ffd54f',
@@ -60,7 +60,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setAlpha(0.8);
 
     this.add
-      .text(width / 2, height / 2 + 100, 'Tap / Click / Space\nto choose speed', {
+      .text(width / 2, height / 2 + 100, 'Tippen / Klicken / Leertaste\nfür Geschwindigkeitswahl', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
