@@ -6,7 +6,7 @@ export const GAME_SETTINGS = {
   flapVelocity: -320,
   maxFallSpeed: 500,
   pipeSpeed: -160,
-  pipeGap: 190,
+  pipeGap: 230,
   pipeSpawnInterval: 1500,
   pipeHorizontalMargin: 60,
   groundHeight: 40,
@@ -20,7 +20,7 @@ export const DIFFICULTY_RAMP = {
   speedIncrement: 14,
   gapDecrement: 8,
   maxPipeSpeed: -320,
-  minPipeGap: 130,
+  minPipeGap: 160,
 };
 
 export const GAME_MODES = {
