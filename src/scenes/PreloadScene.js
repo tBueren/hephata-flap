@@ -17,7 +17,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.generateBackgroundTexture();
     this.generateGroundTexture();
 
-    this.scene.start('ModeSelectScene');
+    this.scene.start('SpeedSelectScene');
   }
 
   generateBirdTexture() {

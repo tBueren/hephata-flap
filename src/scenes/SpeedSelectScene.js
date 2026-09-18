@@ -1,9 +1,11 @@
 import Phaser from 'phaser';
-import { GAME_MODES } from '../config.js';
+import { SPEED_PRESETS } from '../config.js';
 
-export default class ModeSelectScene extends Phaser.Scene {
+const KEY_HINTS = ['ONE', 'TWO', 'THREE'];
+
+export default class SpeedSelectScene extends Phaser.Scene {
   constructor() {
-    super('ModeSelectScene');
+    super('SpeedSelectScene');
   }
 
   create() {
@@ -22,26 +24,16 @@ export default class ModeSelectScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.createModeButton(
-      width / 2,
-      height / 2 - 60,
-      'Classic',
-      'Constant speed & gap',
-      GAME_MODES.CLASSIC,
-      '1'
-    );
+    const entries = Object.entries(SPEED_PRESETS);
+    const spacing = 110;
+    const startY = height / 2 - ((entries.length - 1) * spacing) / 2;
 
-    this.createModeButton(
-      width / 2,
-      height / 2 + 60,
-      'Advanced',
-      'Speeds up as you score',
-      GAME_MODES.ADVANCED,
-      '2'
-    );
+    entries.forEach(([speedKey, preset], i) => {
+      this.createSpeedButton(width / 2, startY + i * spacing, preset.label, speedKey, i);
+    });
   }
 
-  createModeButton(x, y, label, subtitle, mode, keyHint) {
+  createSpeedButton(x, y, label, speedKey, index) {
     const btnWidth = 260;
     const btnHeight = 90;
 
@@ -51,7 +43,7 @@ export default class ModeSelectScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     this.add
-      .text(x, y - 14, label, {
+      .text(x, y, label, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '26px',
         color: '#ffffff',
@@ -59,15 +51,7 @@ export default class ModeSelectScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(x, y + 18, subtitle, {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '14px',
-        color: '#e0f2e9',
-      })
-      .setOrigin(0.5);
-
-    this.add
-      .text(x, y + btnHeight / 2 + 14, `press ${keyHint}`, {
+      .text(x, y + btnHeight / 2 + 14, `press ${index + 1}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '12px',
         color: '#ffffff',
@@ -77,14 +61,12 @@ export default class ModeSelectScene extends Phaser.Scene {
 
     button.on('pointerover', () => button.setFillStyle(0x3d8f1f, 0.9));
     button.on('pointerout', () => button.setFillStyle(0x2e6e17, 0.85));
-    button.on('pointerdown', () => this.selectMode(mode));
+    button.on('pointerdown', () => this.selectSpeed(speedKey));
 
-    this.input.keyboard.once(`keydown-${keyHint === '1' ? 'ONE' : 'TWO'}`, () =>
-      this.selectMode(mode)
-    );
+    this.input.keyboard.once(`keydown-${KEY_HINTS[index]}`, () => this.selectSpeed(speedKey));
   }
 
-  selectMode(mode) {
-    this.scene.start('PlayScene', { mode });
+  selectSpeed(speedKey) {
+    this.scene.start('PlayScene', { speed: speedKey });
   }
 }

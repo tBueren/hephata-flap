@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { STORAGE_KEY, GAME_MODES } from '../config.js';
+import { STORAGE_KEY, SPEED_PRESETS, DEFAULT_SPEED } from '../config.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -8,7 +8,7 @@ export default class GameOverScene extends Phaser.Scene {
 
   init(data) {
     this.score = data.score ?? 0;
-    this.mode = data.mode || GAME_MODES.CLASSIC;
+    this.speedKey = data.speed && SPEED_PRESETS[data.speed] ? data.speed : DEFAULT_SPEED;
   }
 
   create() {
@@ -49,23 +49,18 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(
-        width / 2,
-        height / 2 + 40,
-        this.mode === GAME_MODES.ADVANCED ? 'Advanced' : 'Classic',
-        {
-          fontFamily: 'Arial, sans-serif',
-          fontSize: '14px',
-          color: '#ffffff',
-          stroke: '#000000',
-          strokeThickness: 3,
-        }
-      )
+      .text(width / 2, height / 2 + 40, SPEED_PRESETS[this.speedKey].label, {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '14px',
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3,
+      })
       .setOrigin(0.5)
       .setAlpha(0.8);
 
     this.add
-      .text(width / 2, height / 2 + 100, 'Tap / Click / Space\nto choose mode', {
+      .text(width / 2, height / 2 + 100, 'Tap / Click / Space\nto choose speed', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
@@ -80,7 +75,7 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   updateBestScore(score) {
-    const key = `${STORAGE_KEY}_${this.mode}`;
+    const key = `${STORAGE_KEY}_${this.speedKey}`;
     const stored = Number(localStorage.getItem(key) ?? 0);
     const best = Math.max(stored, score);
     localStorage.setItem(key, String(best));
@@ -88,6 +83,6 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   restart() {
-    this.scene.start('ModeSelectScene');
+    this.scene.start('SpeedSelectScene');
   }
 }

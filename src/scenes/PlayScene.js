@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
-import { GAME_SETTINGS, DIFFICULTY_RAMP, GAME_MODES } from '../config.js';
+import { GAME_SETTINGS, SPEED_PRESETS, DEFAULT_SPEED } from '../config.js';
 
 const {
   gravity,
   flapVelocity,
   maxFallSpeed,
-  pipeSpeed,
   pipeGap,
   pipeHorizontalGapFactor,
   minPipeHorizontalGap,
@@ -19,7 +18,8 @@ export default class PlayScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.mode = data.mode || GAME_MODES.CLASSIC;
+    this.speedKey = data.speed && SPEED_PRESETS[data.speed] ? data.speed : DEFAULT_SPEED;
+    this.pipeSpeed = SPEED_PRESETS[this.speedKey].pipeSpeed;
   }
 
   create() {
@@ -29,8 +29,6 @@ export default class PlayScene extends Phaser.Scene {
     this.gameStarted = false;
     this.gameOver = false;
     this.pipePairs = [];
-    this.currentPipeSpeed = pipeSpeed;
-    this.currentPipeGap = pipeGap;
 
     this.physics.world.setBounds(0, 0, this.width, this.height - groundHeight);
 
@@ -75,7 +73,7 @@ export default class PlayScene extends Phaser.Scene {
       .setDepth(UI_DEPTH);
 
     this.add
-      .text(this.width / 2, 76, this.mode === GAME_MODES.ADVANCED ? 'Advanced' : 'Classic', {
+      .text(this.width / 2, 76, SPEED_PRESETS[this.speedKey].label, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '14px',
         color: '#ffffff',
@@ -128,7 +126,7 @@ export default class PlayScene extends Phaser.Scene {
 
   getPipeIntervalMs() {
     const targetGap = Math.max(minPipeHorizontalGap, this.width * pipeHorizontalGapFactor);
-    return (targetGap / Math.abs(this.currentPipeSpeed)) * 1000;
+    return (targetGap / Math.abs(this.pipeSpeed)) * 1000;
   }
 
   // Pretends the pipe timer already started `headStart` ms in the past,
@@ -139,7 +137,7 @@ export default class PlayScene extends Phaser.Scene {
   // first scheduled pipe — at the normal spacing.
   spawnInitialPipes() {
     const interval = this.getPipeIntervalMs();
-    const speedMag = Math.abs(this.currentPipeSpeed);
+    const speedMag = Math.abs(this.pipeSpeed);
     const edgeX = this.width + 40;
     const fullTravelMs = ((edgeX - this.bird.x) / speedMag) * 1000;
     const headStart = fullTravelMs / 2;
@@ -170,20 +168,19 @@ export default class PlayScene extends Phaser.Scene {
   }
 
   spawnPipePair(spawnX = this.width + 40) {
-    const gap = this.currentPipeGap;
-    const minGapY = pipeHorizontalMargin + gap / 2;
+    const minGapY = pipeHorizontalMargin + pipeGap / 2;
     const maxGapY = Math.max(
-      this.height - groundHeight - pipeHorizontalMargin - gap / 2,
+      this.height - groundHeight - pipeHorizontalMargin - pipeGap / 2,
       minGapY
     );
     const gapY = Phaser.Math.Between(minGapY, maxGapY);
     const x = spawnX;
     const pipeWidth = 52;
 
-    const topHeight = gapY - gap / 2;
+    const topHeight = gapY - pipeGap / 2;
     const topPipe = this.makePipeSegment(x, topHeight / 2, pipeWidth, topHeight);
 
-    const bottomTop = gapY + gap / 2;
+    const bottomTop = gapY + pipeGap / 2;
     const bottomHeight = this.height - groundHeight - bottomTop;
     const bottomPipe = this.makePipeSegment(x, bottomTop + bottomHeight / 2, pipeWidth, bottomHeight);
 
@@ -196,18 +193,8 @@ export default class PlayScene extends Phaser.Scene {
     this.pipesGroup.add(segment);
     segment.body.setAllowGravity(false);
     segment.body.immovable = true;
-    segment.body.setVelocity(this.currentPipeSpeed, 0);
+    segment.body.setVelocity(this.pipeSpeed, 0);
     return segment;
-  }
-
-  applyDifficultyRamp() {
-    if (this.mode !== GAME_MODES.ADVANCED) return;
-
-    const { scoreStep, speedIncrement, gapDecrement, maxPipeSpeed, minPipeGap } = DIFFICULTY_RAMP;
-    const tier = Math.floor(this.score / scoreStep);
-
-    this.currentPipeSpeed = Math.max(pipeSpeed - tier * speedIncrement, maxPipeSpeed);
-    this.currentPipeGap = Math.max(pipeGap - tier * gapDecrement, minPipeGap);
   }
 
   handleGameOver() {
@@ -219,7 +206,7 @@ export default class PlayScene extends Phaser.Scene {
     this.bird.setTint(0xff4444);
 
     this.time.delayedCall(500, () => {
-      this.scene.start('GameOverScene', { score: this.score, mode: this.mode });
+      this.scene.start('GameOverScene', { score: this.score, speed: this.speedKey });
     });
   }
 
@@ -236,7 +223,6 @@ export default class PlayScene extends Phaser.Scene {
         pair.scored = true;
         this.score += 1;
         this.scoreText.setText(String(this.score));
-        this.applyDifficultyRamp();
       }
     }
 

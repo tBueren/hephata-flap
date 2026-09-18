@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene.js';
 import PreloadScene from './scenes/PreloadScene.js';
-import ModeSelectScene from './scenes/ModeSelectScene.js';
+import SpeedSelectScene from './scenes/SpeedSelectScene.js';
 import PlayScene from './scenes/PlayScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 
@@ -21,7 +21,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [BootScene, PreloadScene, ModeSelectScene, PlayScene, GameOverScene],
+  scene: [BootScene, PreloadScene, SpeedSelectScene, PlayScene, GameOverScene],
 };
 
 new Phaser.Game(config);
