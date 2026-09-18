@@ -67,18 +67,21 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   generateBackgroundTexture() {
+    // Sized to the actual window at boot (the canvas fills the browser
+    // window via Phaser.Scale.RESIZE), so this covers it edge-to-edge
+    // with no stretching. Cloud positions are fractions of that size.
     const g = this.add.graphics();
-    const w = 400;
-    const h = 600;
+    const w = this.scale.width;
+    const h = this.scale.height;
 
     g.fillGradientStyle(0x4ec0ca, 0x4ec0ca, 0x8fe0e8, 0x8fe0e8, 1);
     g.fillRect(0, 0, w, h);
 
     // Simple clouds
     g.fillStyle(0xffffff, 0.5);
-    g.fillEllipse(80, 100, 70, 30);
-    g.fillEllipse(280, 200, 90, 34);
-    g.fillEllipse(150, 340, 60, 26);
+    g.fillEllipse(w * 0.2, h * 0.17, 70, 30);
+    g.fillEllipse(w * 0.7, h * 0.33, 90, 34);
+    g.fillEllipse(w * 0.38, h * 0.57, 60, 26);
 
     g.generateTexture('background', w, h);
     g.destroy();

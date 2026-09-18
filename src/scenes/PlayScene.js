@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, GAME_SETTINGS, DIFFICULTY_RAMP, GAME_MODES } from '../config.js';
+import { GAME_SETTINGS, DIFFICULTY_RAMP, GAME_MODES } from '../config.js';
 
 const {
   gravity,
@@ -7,7 +7,8 @@ const {
   maxFallSpeed,
   pipeSpeed,
   pipeGap,
-  pipeSpawnInterval,
+  pipeHorizontalGapFactor,
+  minPipeHorizontalGap,
   pipeHorizontalMargin,
   groundHeight,
 } = GAME_SETTINGS;
@@ -22,6 +23,8 @@ export default class PlayScene extends Phaser.Scene {
   }
 
   create() {
+    this.width = this.scale.width;
+    this.height = this.scale.height;
     this.score = 0;
     this.gameStarted = false;
     this.gameOver = false;
@@ -29,21 +32,21 @@ export default class PlayScene extends Phaser.Scene {
     this.currentPipeSpeed = pipeSpeed;
     this.currentPipeGap = pipeGap;
 
-    this.physics.world.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT - groundHeight);
+    this.physics.world.setBounds(0, 0, this.width, this.height - groundHeight);
 
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'background');
+    this.add.image(this.width / 2, this.height / 2, 'background');
 
     this.ground = this.add.tileSprite(
-      GAME_WIDTH / 2,
-      GAME_HEIGHT - groundHeight / 2,
-      GAME_WIDTH,
+      this.width / 2,
+      this.height - groundHeight / 2,
+      this.width,
       groundHeight,
       'ground'
     );
 
     this.pipesGroup = this.physics.add.group();
 
-    this.bird = this.physics.add.sprite(GAME_WIDTH * 0.28, GAME_HEIGHT / 2, 'bird');
+    this.bird = this.physics.add.sprite(this.width * 0.28, this.height / 2, 'bird');
     this.bird.body.setAllowGravity(false);
     this.bird.body.setMaxVelocity(400, maxFallSpeed);
     this.bird.body.setCollideWorldBounds(true);
@@ -61,7 +64,7 @@ export default class PlayScene extends Phaser.Scene {
     const UI_DEPTH = 10;
 
     this.scoreText = this.add
-      .text(GAME_WIDTH / 2, 40, '0', {
+      .text(this.width / 2, 40, '0', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '48px',
         color: '#ffffff',
@@ -72,7 +75,7 @@ export default class PlayScene extends Phaser.Scene {
       .setDepth(UI_DEPTH);
 
     this.add
-      .text(GAME_WIDTH / 2, 76, this.mode === GAME_MODES.ADVANCED ? 'Advanced' : 'Classic', {
+      .text(this.width / 2, 76, this.mode === GAME_MODES.ADVANCED ? 'Advanced' : 'Classic', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '14px',
         color: '#ffffff',
@@ -84,7 +87,7 @@ export default class PlayScene extends Phaser.Scene {
       .setDepth(UI_DEPTH);
 
     this.instructionText = this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 80, 'Tap / Click / Space\nto flap', {
+      .text(this.width / 2, this.height / 2 + 80, 'Tap / Click / Space\nto flap', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
@@ -120,32 +123,68 @@ export default class PlayScene extends Phaser.Scene {
     this.bird.body.setAllowGravity(true);
     this.physics.world.gravity.y = gravity;
 
-    this.pipeTimer = this.time.addEvent({
-      delay: pipeSpawnInterval,
-      callback: () => this.spawnPipePair(),
-      loop: true,
-    });
+    this.spawnInitialPipes();
+  }
 
-    this.spawnPipePair();
+  getPipeIntervalMs() {
+    const targetGap = Math.max(minPipeHorizontalGap, this.width * pipeHorizontalGapFactor);
+    return (targetGap / Math.abs(this.currentPipeSpeed)) * 1000;
+  }
+
+  // Pretends the pipe timer already started `headStart` ms in the past,
+  // spawning (at their current mid-flight positions) whichever pipes
+  // would already exist by now, then hands off to the normal timer for
+  // the rest. This halves the wait before the first pipe arrives while
+  // keeping every pipe-to-pipe gap — including the one leading into the
+  // first scheduled pipe — at the normal spacing.
+  spawnInitialPipes() {
+    const interval = this.getPipeIntervalMs();
+    const speedMag = Math.abs(this.currentPipeSpeed);
+    const edgeX = this.width + 40;
+    const fullTravelMs = ((edgeX - this.bird.x) / speedMag) * 1000;
+    const headStart = fullTravelMs / 2;
+
+    let spawned = 0;
+    let elapsed = headStart;
+    while (elapsed >= 0) {
+      const position = edgeX - (speedMag * elapsed) / 1000;
+      this.spawnPipePair(position);
+      spawned += 1;
+      elapsed = headStart - spawned * interval;
+    }
+
+    this.scheduleNextPipe(interval - (headStart % interval));
+  }
+
+  scheduleNextPipe(delay) {
+    const useDelay = delay ?? this.getPipeIntervalMs();
+
+    this.pipeTimer = this.time.delayedCall(useDelay, () => {
+      this.spawnPipePair();
+      this.scheduleNextPipe();
+    });
   }
 
   flap() {
     this.bird.setVelocityY(flapVelocity);
   }
 
-  spawnPipePair() {
+  spawnPipePair(spawnX = this.width + 40) {
     const gap = this.currentPipeGap;
     const minGapY = pipeHorizontalMargin + gap / 2;
-    const maxGapY = GAME_HEIGHT - groundHeight - pipeHorizontalMargin - gap / 2;
+    const maxGapY = Math.max(
+      this.height - groundHeight - pipeHorizontalMargin - gap / 2,
+      minGapY
+    );
     const gapY = Phaser.Math.Between(minGapY, maxGapY);
-    const x = GAME_WIDTH + 40;
+    const x = spawnX;
     const pipeWidth = 52;
 
     const topHeight = gapY - gap / 2;
     const topPipe = this.makePipeSegment(x, topHeight / 2, pipeWidth, topHeight);
 
     const bottomTop = gapY + gap / 2;
-    const bottomHeight = GAME_HEIGHT - groundHeight - bottomTop;
+    const bottomHeight = this.height - groundHeight - bottomTop;
     const bottomPipe = this.makePipeSegment(x, bottomTop + bottomHeight / 2, pipeWidth, bottomHeight);
 
     this.pipePairs.push({ top: topPipe, bottom: bottomPipe, scored: false });

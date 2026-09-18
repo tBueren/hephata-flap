@@ -1,5 +1,6 @@
-export const GAME_WIDTH = 400;
-export const GAME_HEIGHT = 600;
+// The canvas resizes to fill the actual browser window (see main.js's
+// Phaser.Scale.RESIZE), so scenes read their layout size from
+// `this.scale.width` / `this.scale.height` rather than a fixed constant.
 
 export const GAME_SETTINGS = {
   gravity: 900,
@@ -7,7 +8,11 @@ export const GAME_SETTINGS = {
   maxFallSpeed: 500,
   pipeSpeed: -160,
   pipeGap: 230,
-  pipeSpawnInterval: 1500,
+  // Horizontal distance between consecutive pipe pairs is derived from
+  // this fraction of the current window width (floored below), so pipes
+  // stay well spaced on a wide desktop window instead of bunching up.
+  pipeHorizontalGapFactor: 0.315,
+  minPipeHorizontalGap: 225,
   pipeHorizontalMargin: 60,
   groundHeight: 40,
 };

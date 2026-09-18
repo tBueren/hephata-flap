@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT } from './config.js';
 import BootScene from './scenes/BootScene.js';
 import PreloadScene from './scenes/PreloadScene.js';
 import ModeSelectScene from './scenes/ModeSelectScene.js';
@@ -9,12 +8,11 @@ import GameOverScene from './scenes/GameOverScene.js';
 const config = {
   type: Phaser.AUTO,
   parent: 'app',
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
+  width: window.innerWidth,
+  height: window.innerHeight,
   backgroundColor: '#4ec0ca',
   scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.RESIZE,
   },
   physics: {
     default: 'arcade',

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, STORAGE_KEY, GAME_MODES } from '../config.js';
+import { STORAGE_KEY, GAME_MODES } from '../config.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -12,12 +12,14 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   create() {
+    const width = this.scale.width;
+    const height = this.scale.height;
     const best = this.updateBestScore(this.score);
 
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'background');
+    this.add.image(width / 2, height / 2, 'background');
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 120, 'Game Over', {
+      .text(width / 2, height / 2 - 120, 'Game Over', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '40px',
         color: '#ffffff',
@@ -27,7 +29,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40, `Score: ${this.score}`, {
+      .text(width / 2, height / 2 - 40, `Score: ${this.score}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '28px',
         color: '#ffffff',
@@ -37,7 +39,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, `Best: ${best}`, {
+      .text(width / 2, height / 2, `Best: ${best}`, {
         fontFamily: 'Arial, sans-serif',
         fontSize: '28px',
         color: '#ffd54f',
@@ -48,8 +50,8 @@ export default class GameOverScene extends Phaser.Scene {
 
     this.add
       .text(
-        GAME_WIDTH / 2,
-        GAME_HEIGHT / 2 + 40,
+        width / 2,
+        height / 2 + 40,
         this.mode === GAME_MODES.ADVANCED ? 'Advanced' : 'Classic',
         {
           fontFamily: 'Arial, sans-serif',
@@ -63,7 +65,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setAlpha(0.8);
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 100, 'Tap / Click / Space\nto choose mode', {
+      .text(width / 2, height / 2 + 100, 'Tap / Click / Space\nto choose mode', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
