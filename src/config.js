@@ -21,7 +21,7 @@ export const GAME_SETTINGS = {
 export const SPEED_PRESETS = {
   slow: { label: 'Langsam', pipeSpeed: -120 },
   medium: { label: 'Mittel', pipeSpeed: -160 },
-  fast: { label: 'Schnell', pipeSpeed: -210 },
+  fast: { label: 'Schnell', pipeSpeed: -230 },
 };
 
 export const DEFAULT_SPEED = 'medium';
