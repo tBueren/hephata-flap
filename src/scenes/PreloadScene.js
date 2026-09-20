@@ -1,14 +1,17 @@
 import Phaser from 'phaser';
 
-// Placeholder textures are generated procedurally so the game is playable
-// with zero external assets. To swap in real mascot/product art later,
-// replace the generate* calls below with this.load.image(key, url) calls
-// in preload(), pointing at files under public/assets/images/ — keep the
-// same texture keys ('bird', 'pipe', 'background', 'ground') so PlayScene
-// needs no changes.
+// The bird uses real art from public/assets/images/; the other textures are
+// generated procedurally as placeholders. To swap those for real art, replace
+// the generate* calls below with this.load.image(key, url) calls in
+// preload() — keep the same texture keys ('bird', 'pipe', 'background',
+// 'ground') so PlayScene needs no changes.
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
     super('PreloadScene');
+  }
+
+  preload() {
+    this.load.image('birdLogo', `${import.meta.env.BASE_URL}assets/images/bird.png`);
   }
 
   create() {
@@ -20,31 +23,30 @@ export default class PreloadScene extends Phaser.Scene {
     this.scene.start('SpeedSelectScene');
   }
 
+  // The bird is the Hephata logo (public/assets/images/bird.png) on a small
+  // white orb, baked into one 'bird' texture so PlayScene can treat it as a
+  // single sprite.
   generateBirdTexture() {
-    const g = this.add.graphics();
-    const w = 34;
-    const h = 26;
+    const size = 48;
+    const logoHeight = 30;
 
-    // Body (mascot blob)
-    g.fillStyle(0xf6b93b, 1);
-    g.fillEllipse(w / 2, h / 2, w - 4, h - 2);
+    const orb = this.add.graphics();
+    orb.fillStyle(0xffffff, 1);
+    orb.fillCircle(size / 2, size / 2, size / 2);
+    orb.lineStyle(2, 0xd9d9d9, 1);
+    orb.strokeCircle(size / 2, size / 2, size / 2 - 1);
 
-    // Wing
-    g.fillStyle(0xe58e26, 1);
-    g.fillEllipse(w / 2 - 4, h / 2 + 2, 12, 8);
+    const logo = this.add.image(0, 0, 'birdLogo');
+    logo.setScale(logoHeight / logo.height);
 
-    // Beak
-    g.fillStyle(0xff7f27, 1);
-    g.fillTriangle(w - 6, h / 2 - 3, w - 6, h / 2 + 3, w + 4, h / 2);
+    const rt = this.add.renderTexture(0, 0, size, size);
+    rt.draw(orb, 0, 0);
+    rt.draw(logo, size / 2, size / 2);
+    rt.saveTexture('bird');
 
-    // Eye
-    g.fillStyle(0xffffff, 1);
-    g.fillCircle(w / 2 + 5, h / 2 - 5, 5);
-    g.fillStyle(0x1a1a1a, 1);
-    g.fillCircle(w / 2 + 6, h / 2 - 5, 2.5);
-
-    g.generateTexture('bird', w + 4, h + 2);
-    g.destroy();
+    orb.destroy();
+    logo.destroy();
+    rt.destroy();
   }
 
   generatePipeTexture() {

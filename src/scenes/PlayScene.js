@@ -45,6 +45,7 @@ export default class PlayScene extends Phaser.Scene {
     this.pipesGroup = this.physics.add.group();
 
     this.bird = this.physics.add.sprite(this.width * 0.28, this.height / 2, 'bird');
+    this.bird.body.setCircle(this.bird.width / 2 - 4, 4, 4);
     this.bird.body.setAllowGravity(false);
     this.bird.body.setMaxVelocity(400, maxFallSpeed);
     this.bird.body.setCollideWorldBounds(true);
