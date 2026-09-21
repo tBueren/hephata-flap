@@ -3,15 +3,44 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:start": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder"
   },
   "devDependencies": {
+    "electron": "^44.4.3",
+    "electron-builder": "^26.15.3",
     "vite": "^8.3.0"
   },
   "dependencies": {
     "phaser": "^3.90.0"
+  },
+  "allowScripts": {
+    "electron@44.4.3": true,
+    "electron-winstaller@5.4.0": true
+  },
+  "build": {
+    "appId": "com.hephata.bird",
+    "productName": "Hephata Bird",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "mac": {
+      "target": "dir"
+    }
   }
 }
