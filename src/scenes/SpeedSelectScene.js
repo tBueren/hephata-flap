@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SPEED_PRESETS } from '../config.js';
+import { onPadButton, PAD_CONFIRM, PAD_UP, PAD_DOWN } from '../gamepad.js';
 
 const KEY_HINTS = ['ONE', 'TWO', 'THREE'];
 
@@ -25,11 +26,36 @@ export default class SpeedSelectScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const entries = Object.entries(SPEED_PRESETS);
+    this.buttons = [];
+    this.selectedIndex = 0;
     const spacing = 110;
     const startY = height / 2 - ((entries.length - 1) * spacing) / 2;
 
     entries.forEach(([speedKey, preset], i) => {
       this.createSpeedButton(width / 2, startY + i * spacing, preset.label, speedKey, i);
+    });
+
+    this.add
+      .text(width / 2, height * 0.9, 'Controller: Steuerkreuz wählen, A/X starten', {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '16px',
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 4,
+      })
+      .setOrigin(0.5);
+
+    this.highlight(0);
+    onPadButton(this, PAD_UP, () => this.highlight(this.selectedIndex - 1));
+    onPadButton(this, PAD_DOWN, () => this.highlight(this.selectedIndex + 1));
+    onPadButton(this, PAD_CONFIRM, () => this.selectSpeed(this.buttons[this.selectedIndex].speedKey));
+  }
+
+  highlight(index) {
+    const count = this.buttons.length;
+    this.selectedIndex = (index + count) % count;
+    this.buttons.forEach(({ button }, i) => {
+      button.setStrokeStyle(i === this.selectedIndex ? 6 : 3, i === this.selectedIndex ? 0xffd700 : 0xffffff);
     });
   }
 
@@ -62,6 +88,7 @@ export default class SpeedSelectScene extends Phaser.Scene {
     button.on('pointerover', () => button.setFillStyle(0x3d8f1f, 0.9));
     button.on('pointerout', () => button.setFillStyle(0x2e6e17, 0.85));
     button.on('pointerdown', () => this.selectSpeed(speedKey));
+    this.buttons.push({ button, speedKey });
 
     this.input.keyboard.once(`keydown-${KEY_HINTS[index]}`, () => this.selectSpeed(speedKey));
   }

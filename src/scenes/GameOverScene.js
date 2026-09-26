@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { STORAGE_KEY, SPEED_PRESETS, DEFAULT_SPEED } from '../config.js';
+import { onPadButton, PAD_CONFIRM } from '../gamepad.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -60,7 +61,7 @@ export default class GameOverScene extends Phaser.Scene {
       .setAlpha(0.8);
 
     this.add
-      .text(width / 2, height / 2 + 100, 'Tippen / Klicken / Leertaste\nfür Geschwindigkeitswahl', {
+      .text(width / 2, height / 2 + 100, 'Tippen / Klicken / Leertaste / Controller A/X\nfür Geschwindigkeitswahl', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
@@ -72,6 +73,7 @@ export default class GameOverScene extends Phaser.Scene {
 
     this.input.once('pointerdown', () => this.restart());
     this.input.keyboard.once('keydown-SPACE', () => this.restart());
+    onPadButton(this, PAD_CONFIRM, () => this.restart());
   }
 
   updateBestScore(score) {

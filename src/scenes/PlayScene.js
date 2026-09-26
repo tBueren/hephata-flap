@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_SETTINGS, SPEED_PRESETS, DEFAULT_SPEED } from '../config.js';
+import { onPadButton, PAD_CONFIRM } from '../gamepad.js';
 
 const {
   gravity,
@@ -86,7 +87,7 @@ export default class PlayScene extends Phaser.Scene {
       .setDepth(UI_DEPTH);
 
     this.instructionText = this.add
-      .text(this.width / 2, this.height / 2 + 80, 'Tippen / Klicken / Leertaste\nzum Flattern', {
+      .text(this.width / 2, this.height / 2 + 80, 'Tippen / Klicken / Leertaste / Controller A/X\nzum Flattern', {
         fontFamily: 'Arial, sans-serif',
         fontSize: '20px',
         color: '#ffffff',
@@ -106,6 +107,7 @@ export default class PlayScene extends Phaser.Scene {
 
     this.input.on('pointerdown', () => this.handleInput());
     this.input.keyboard.on('keydown-SPACE', () => this.handleInput());
+    onPadButton(this, PAD_CONFIRM, () => this.handleInput());
   }
 
   handleInput() {

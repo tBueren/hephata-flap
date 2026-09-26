@@ -21,6 +21,9 @@ const config = {
       debug: false,
     },
   },
+  input: {
+    gamepad: true,
+  },
   scene: [BootScene, PreloadScene, SpeedSelectScene, PlayScene, GameOverScene],
 };
 
